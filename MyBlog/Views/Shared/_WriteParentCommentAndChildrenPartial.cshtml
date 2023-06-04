@@ -1,0 +1,57 @@
+﻿@using MyBlog.Models.ViewModels.SharedViewModels
+@using MyBlog.Data.Entities
+@model CommentVM
+
+@if (Model.IsReply == false)
+{
+    @:<div class="removedTransition rounded rounded-3 border-bottom border-5 border-secondary mb-5" 
+    @:      style="margin-left:2%; background-color:lightgray;">
+}
+
+@{
+    await WriteComments(Model.Comment); // recursion
+
+    async Task WriteComments(Comment comment)
+    {
+        if (comment.ParentCommentId is null)
+        {
+                <partial name='_CommentViewPartial'
+                         model='Model'/>
+        }
+
+        Model.CurrentNested++;
+
+            if (comment!.ChildComments is not null)
+            {     
+                
+                foreach (var childComment in comment.ChildComments.OrderBy(c => c.Created))
+                {
+                    @: <div class="removedTransition rounded rounded-3" 
+                    @:      style="margin-left:2%; background-color:@Model.BackgroundColor;">
+                        <partial name="_CommentViewPartial"
+                                 model="new CommentVM
+                                        {
+                                            Comment = childComment,
+                                            CurrentNested = Model.CurrentNested
+                                        }" />
+
+                        await WriteComments(childComment!); // recursion
+                    @: </div>
+                }             
+            }
+            else if(Model.IsReply == true)
+            {
+                @: <div class="removedTransition rounded rounded-3" 
+                @:       style="margin-left:2%;background-color:@Model.BackgroundColor;">
+                        <partial name="_CommentViewPartial" model="Model" />
+                @: </div>
+            }
+
+        Model.CurrentNested--;
+    }
+}
+
+@if (Model.IsReply == false)
+{
+    @:</div>
+}

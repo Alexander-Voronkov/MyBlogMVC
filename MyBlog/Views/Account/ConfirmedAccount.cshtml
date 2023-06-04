@@ -1,0 +1,17 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "Confirmed Account";
+}
+
+<div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">Congratulate, @(Model)!</h4>
+    <p>Account was confirmed</p>
+    <hr>
+    <p class="mb-0">
+        <a asp-action="Index"
+           asp-controller="Home"
+           class="link-success">On Main Page</a>
+    </p>
+</div>
+

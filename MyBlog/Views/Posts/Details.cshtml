@@ -1,0 +1,168 @@
+﻿@using MyBlog.Authorization
+@using MyBlog.Data.Entities
+@using MyBlog.Models.ViewModels.PostsViewModels
+@using MyBlog.Models.ViewModels.SharedViewModels
+@model DetailsPostVM
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="mb-5">
+    <a asp-action="Index"
+        class="link-secondary text-decoration-none fw-bold fs-3 mb-5">
+        <i class="bi bi-arrow-return-left"></i> On Main Page
+    </a>
+</div>
+
+@if (User.HasClaim(MyClaims.PostsWriter, MyClaims.PostsWriter))
+{
+    <div class="row">
+        <div class="col col-6">
+            <a href="#"
+           class="btn btn-lg btn-warning">
+                Edit
+            </a>
+        </div>
+        @if (User.HasClaim(MyClaims.Admin, MyClaims.Admin))
+        {
+            <div class="row">
+                <div class="col col-6">
+                    <a href="#"
+               class="btn btn-lg btn-danger">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<h1 class="display-3 fw-semibold text-center mb-5">
+    @Model.Post.Title
+</h1>
+
+<div class="d-flex flex-row align-items-center fs-3 mb-5">
+
+    <div class="pe-md-5 pe-3">
+        <i class="bi bi-calendar4-week"></i>
+        @Model.Post.Created.ToShortDateString()
+    </div>
+
+    <div class="text-muted fs-1 pe-md-5 pe-3">
+        |
+    </div>
+
+    <div class="badge bg-warning fw-bold pe-3">
+        @if(Model.Post.Category != null)
+        {
+            <a asp-action="Index" 
+                asp-route-categoryId="@Model.Post.CategoryId"
+                class="text-decoration-none">
+                @Model.Post.Category!.Name
+            </a>
+        }
+        else
+        {
+            @:"No Category"
+        }
+    </div>
+
+</div>
+
+
+<div class="text-center">
+    <img src="data:image/*;base64,@(Convert.ToBase64String(Model.Post.MainPostImage!))"
+         class="img-fluid img-thumbnail mb-5"
+         alt="@Model.Post.Title">
+
+    <div style="white-space: pre-line" class="fs-3 mb-5">
+        @Model.Post.Body
+    </div>
+    <hr class="bg-warning border-0 mb-1" style="height:10px"/>
+    <hr class="bg-info border-0 mt-0" style="height:10px" />
+</div>
+
+
+<p>
+    <button class="btn btn-light text-center border-5 border-bottom w-100"
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#collapseComments" 
+            aria-expanded="false" 
+            aria-controls="collapseComments">
+            <div class="row align-items-center">
+            <div class="col-4 text-start ms-md-3">
+                    <span id="commentsCountId" 
+                          class="bi bi-chat-dots fs-3">@Model.Post.Comments!.Count</span>
+                </div>
+                <div class="col-4">
+                    <span class="display-3">@Html.DisplayNameFor(m => m.Post.Comments)</span>
+                </div>
+            </div>
+    </button>
+</p>
+
+
+<div class="collapsed" id="collapseComments">
+    @foreach (var comment in Model.Post.Comments
+                                .Where(c => c.ParentCommentId == null)
+                                .OrderBy(c => c.Created))
+    {
+        <partial name="_WriteParentCommentAndChildrenPartial"
+                 model="new CommentVM
+                        {
+                            Comment = comment,
+                            CurrentNested = 0
+                        }"/>
+    }
+
+
+
+    <div id="mainCommentId"></div>
+
+
+
+    @if (User.Identity!.IsAuthenticated)
+    {
+        <div class="mt-5">
+            <form name="mainCommentForm" onsubmit="mainCommentHandler(event)">
+                <textarea asp-for="@(new Comment().Message)"
+                            class="form-control border border-5 border-warning mb-1"
+                            placeholder="Your comment..."
+                            rows="5">
+                </textarea>
+                <span asp-validation-for="@(new Comment().Message)" class="text-danger"></span>
+
+                <input type="hidden" name="postId" value="@Model.Post.Id" />
+
+                <input type="submit"
+                        value="Send"
+                        class="btn btn-lg btn-outline-primary
+                                border-top-0 border-bottom-0 border border-5 border-primary 
+                                mb-1 me-5 ps-3 pe-3 w-100 fw-bold" />
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            For write the comments here please
+            <a asp-controller="Account" 
+                asp-action="Login" 
+                class="alert-link">log in</a>
+            or
+            <a asp-controller="Account" 
+                asp-action="Register" 
+                class="alert-link"> register</a>
+        </div>
+    }
+</div>
+
+<script src="~/js/MyJS/commentsHandlers.js" asp-append-version="true"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

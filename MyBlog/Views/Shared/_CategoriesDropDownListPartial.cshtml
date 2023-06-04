@@ -1,0 +1,45 @@
+﻿@model MyBlog.Models.ViewModels.SharedViewModels.CategoriesDropDownListVM
+
+<button class="btn btn-light dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+    @(Model.CategoryId == 0 ?
+        "All Categories" :
+        Model.Categories.First(c => c.Id == Model.CategoryId).Name)
+</button>
+<ul class="dropdown-menu">
+
+    @{
+        string active = "";
+        bool isActive = false;
+    }
+
+    @foreach (var category in Model.Categories)
+    {
+        if (category.Id == Model.CategoryId && isActive == false)
+        {
+            active = "active";
+            isActive = true;
+        }
+
+        <li>
+            <a asp-action="Index"
+               asp-controller="Posts"
+               asp-route-categoryId="@category.Id"
+           class="@active dropdown-item">@category.Name</a>
+        </li>
+
+        @(active = "")
+    }
+
+    <li>
+        <hr class="dropdown-divider">
+    </li>
+
+    <li>
+        <a asp-action="Index"
+           asp-route-categoryId="0"
+           class="@(isActive == false ? "active" : "") dropdown-item">All Categories</a>
+    </li>
+</ul>

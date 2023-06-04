@@ -1,0 +1,38 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+@if(ViewBag.Message is not null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a  asp-action="Index"
+            asp-controller="SuperAdmin"
+            class="navbar-brand">Navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a  asp-action="Index"
+                    id="adminMenuId1"
+                    class="nav-link active"
+                    aria-current="page">Index</a>
+                <a asp-action="ManageUsersClaims"
+                   id="adminMenuId2"
+                   class="nav-link active"
+                   aria-current="page">Manage Users Claims</a>
+                <a class="nav-link" href="#">Menu 3</a>
+                <a class="nav-link" href="#">Menu 4</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@RenderBody()

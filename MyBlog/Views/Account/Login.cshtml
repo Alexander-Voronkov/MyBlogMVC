@@ -1,0 +1,32 @@
+﻿@model MyBlog.Models.ViewModels.LoginVM
+
+<h2>Login</h2>
+
+<form method="post"
+      asp-action="Login"
+      asp-controller="Account"
+      asp-route-returnUrl="@Model.ReturnUrl">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Email" class="form-control" placeholder="@nameof(Model.Email)">
+        <label asp-for="Email"></label>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Password" class="form-control" placeholder="@nameof(Model.Password)">
+        <label asp-for="Password"></label>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="RememberMe" class="form-check-input">
+        <label asp-for="RememberMe" class="form-check-label"></label>
+    </div>
+
+    <div class="mb-3">
+        <input type="submit" value="Login" class="btn btn-success" />
+    </div>
+</form>

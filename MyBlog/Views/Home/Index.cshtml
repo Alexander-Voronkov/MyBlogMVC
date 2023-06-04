@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p class="display-5">
+        Learn about 
+        <a asp-action="Index" 
+           asp-controller="Posts"
+           class="text-decoration-none">
+            Posts
+        </a>.
+    </p>
+</div>
+
+<h3>Test Claims</h3>
+<div>
+    <a asp-action="SuperAdmin" asp-controller="TestClaims">Super Admin</a>
+</div>
+<div>
+    <a asp-action="Admin" asp-controller="TestClaims">Admin</a>
+</div>
+<div>
+    <a asp-action="PostsWriter" asp-controller="TestClaims">Posts Writer</a>
+</div>

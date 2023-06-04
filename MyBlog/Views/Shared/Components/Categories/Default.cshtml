@@ -1,0 +1,14 @@
+﻿@model MyBlog.Models.ViewModels.SharedViewModels.CategoriesDropDownListVM
+
+<div class="btn-group">
+    <a asp-action="Index"
+       asp-controller="Posts"
+       class="btn btn-light text-success fw-bold">
+       Blog
+    </a>
+    
+    <partial name="_CategoriesDropDownListPartial"
+             model="Model"/>
+
+</div>
+

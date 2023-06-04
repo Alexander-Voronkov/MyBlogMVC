@@ -1,0 +1,83 @@
+﻿@using MyBlog.Authorization
+@using MyBlog.Data.Entities
+@using MyBlog.Models.ViewModels.SharedViewModels
+@model CommentVM
+
+<div class="border border-3 border-light rounded">
+    <div class="d-flex justify-content-between ">
+        <div class="fw-bold m-1 ms-3 mb-0">
+            @Model.Comment.User?.UserName
+        </div>
+        <div class="m-1 me-3 text-muted">
+            @Model.Comment.Created.ToShortDateString() |
+            @Model.Comment.Created.ToShortTimeString()
+        </div>
+    </div>
+    <div class="ms-1 mb-3" style="white-space:pre-line">@Model.Comment!.Message</div>
+
+    <div>
+        @{
+            string disabledReply = Model.CurrentNested == CommentVM.MaxNested ? "disabled" : "";
+            string tabIndex = disabledReply == "disabled" ? "-1" : "0";
+        }
+
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <hr class="text-secondary mb-2 ms-3 me-3" />
+            <button class="btn btn-outline-success
+                              border-top-0 border-bottom-0 border border-3 border-success
+                              mb-2 ms-2 me-5 ps-5 pe-5 @disabledReply"
+                tabindex="@tabIndex"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseReplyForm@(Model.Comment.Id)"
+                aria-expanded="false"
+                aria-controls="collapseReplyForm@(Model.Comment.Id)">
+                Reply
+            </button>
+        }
+
+        @if (User.HasClaim(MyClaims.Admin, MyClaims.Admin))
+        {
+            @*onsubmit delete reply/root comment in js /////////////////////////////////*@
+            <form name="deleteCommentForm@(Model.Comment.Id)"
+              onsubmit="deleteCommentHandler(event, @Model.Comment.Id)"
+              class="d-inline">
+                <button class="btn btn-outline-danger
+                                  border-top-0 border-bottom-0 border border-3 border-danger
+                                  mb-2 me-5 ps-5 pe-5">
+                    Delete
+                </button>
+            </form>
+            @*//////////////////////////////////////////////////////////////////////////*@
+        }
+    </div>
+
+
+    @*onsubmit add reply in js /////////////////////////////////////////////////////////*@
+    <div class="collapse ms-3 me-3 mt-3"
+         id="collapseReplyForm@(Model.Comment.Id)">
+        <form name="replyCommentForm@(Model.Comment.Id)"
+              onsubmit="replyCommentHandler(event, @Model.Comment.Id)">
+
+            <textarea asp-for="@(new Comment().Message)"
+                      class="form-control"
+                      placeholder="Your reply..."
+                      rows="3">
+                </textarea>
+            <span asp-validation-for="@(new Comment().Message)" class="text-danger"></span>
+
+            <input type="hidden" name="postId" value="@Model.Comment.Post!.Id" />
+            @*parentCommentId нового комментария будет Id комментария, на который отвечают*@
+            <input type="hidden" name="parentCommentId" value="@Model.Comment.Id" />
+
+            <input type="hidden" name="currentNested" value="@Model.CurrentNested" />
+
+            <input type="submit"
+                   value="Send"
+                   class="btn btn-outline-success
+                           border-top-0 border-bottom-0 border border-3 border-success
+                           mb-1 me-5 ps-3 pe-3 w-100" />
+        </form>
+    </div>
+    @*////////////////////////////////////////////////////////////////////////////////////*@
+</div>

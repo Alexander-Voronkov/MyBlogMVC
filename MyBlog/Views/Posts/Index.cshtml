@@ -1,0 +1,143 @@
+﻿@*@using MyBlog.Models.ViewModels;*@
+@using Microsoft.AspNetCore.Html
+@using MyBlog.Authorization
+@using MyBlog.Models.ViewModels.NavigationViewModels
+@using MyBlog.Models.ViewModels.PostsViewModels;
+@using MyBlog.Models.ViewModels.SharedViewModels;
+
+@model PostsVM
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index Posts</h1>
+@if (User.HasClaim(MyClaims.PostsWriter, MyClaims.PostsWriter))
+{
+    <a href="#"
+       class="btn btn-lg btn-primary mb-5">
+       New Post
+    </a>
+}
+
+@*<div class="text-center">
+    <div class="dropdown mb-3">
+
+        <partial name="_CategoriesDropDownListPartial",
+                 model="new CategoriesDropDownListVM
+                {
+                    Categories = Model.Categories,
+                    CategoryId = Model.CategoryId,
+                }" />
+    </div>
+</div>*@
+
+
+<div class="row">
+    @*Filter*@
+    <div class="col-lg-8 mb-3">
+        <form method="get" asp-action="Index" class="row align-items-end mb-3">
+            <div class="col-lg-4">
+                <label asp-for="FilterVM!.Search"
+                       class="form-label"></label>
+                <input name="search"
+                       value="@Model.FilterVM!.Search"
+                       type="search"
+                       placeholder="search"
+                       class="form-control"/>
+            </div>
+
+            <div class="col-lg-4">
+                <label asp-for="FilterVM!.CategoriesSL"
+                       class="form-label"></label>
+                <select name="categoryid"
+                        asp-items="@Model.FilterVM.CategoriesSL"
+                        class="form-select"></select>
+            </div>
+
+            <input type="hidden"
+                   name="sortOrder"
+                   value="@Model.SortVM!.Current" />
+
+            <div class="col-lg-4">
+                <input type="submit"
+                       value="Filter"
+                       class="btn btn-primary w-100"/>
+            </div>
+        </form>
+    </div>
+
+    @*Sort*@
+    <div class="offset-1 col-lg-3 mb-3">
+        <div class="text-center">
+            <p>Sort</p>
+            <div class="dropdown">
+                @{
+                    IHtmlContent MakeElementForSortState(SortState sortState)
+                    {
+                        return sortState switch
+                        {
+                            SortState.TitleAsc => Html.Raw("<i class='bi bi-arrow-up'></i> Title"),
+                            SortState.TitleDesc => Html.Raw("<i class='bi bi-arrow-down'></i> Title"),
+
+                            SortState.DescriptionAsc => Html.Raw("<i class='bi bi-arrow-up'></i> Description"),
+                            SortState.DescriptionDesc => Html.Raw("<i class='bi bi-arrow-down'></i> Description"),
+
+                            SortState.CategoryAsc => Html.Raw("<i class='bi bi-arrow-up'></i> Category"),
+                            SortState.CategoryDesc => Html.Raw("<i class='bi bi-arrow-down'></i> Category"),
+
+                            SortState.CreatedAsc => Html.Raw("<i class='bi bi-arrow-up'></i> Created"),
+                            SortState.CreatedDesc => Html.Raw("<i class='bi bi-arrow-down'></i> Created"),
+
+                            _ => Html.Raw("<i class='bi bi-arrow-down'></i> Title")
+                        };
+                    }
+                }
+
+                <button class="btn btn-secondary dropdown-toggle" 
+                        type="button" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                    @MakeElementForSortState(Model.SortVM!.Current)
+                </button>
+
+                <ul class="dropdown-menu">
+
+                    @foreach (SortState sortState in Enum.GetValues(typeof(SortState)))
+                    {
+                        IHtmlContent sortStateEl = MakeElementForSortState(sortState);
+
+                        <li>
+                            <a class="dropdown-item" 
+                               style="cursor:pointer"
+                               asp-action="Index"
+                               asp-route-categoryId="@Model.FilterVM.CategoryId"
+                               asp-route-search="@Model.FilterVM.Search"
+                               asp-route-sortOrder="@sortState"
+                               asp-route-page="@Model.PageVM!.PageNumber">
+                               @sortStateEl</a>
+                        </li>
+                    }       
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row g-3">
+    @foreach (var post in Model.Posts)
+    {
+        <partial name="_PostViewPartial" model="post" />
+    }
+</div>
+
+@* Pagination *@
+<page-link page-vm="Model.PageVM!"
+           page-action="Index"
+           page-url-categoryId="@(Model.FilterVM.CategoryId)"
+           page-url-search="@(Model.FilterVM.Search!)"
+           page-url-sortOrder="@(Model.SortVM.Current)">
+</page-link>
+
+<vc:last-viewed-posts />

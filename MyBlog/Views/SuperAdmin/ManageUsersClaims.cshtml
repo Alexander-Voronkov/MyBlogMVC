@@ -1,0 +1,58 @@
+﻿@using MyBlog.Models.ViewModels.SuperAdminViewModels
+@model IEnumerable<UserAccessVM>
+
+@{
+    Layout = "_SuperAdminLayout";
+
+    int i = 0;
+}
+
+<form asp-action="ManageUsersClaims" method="post">
+    @foreach (var user in Model)
+    {
+        <div class="bg-light border border-3 rounded rounded-3 p-2 mb-3">
+            <div>
+                <span class="fw-semibold">
+                    @(user.Email).
+                </span>
+                Current access -
+                <span class="fw-bold">
+                    @user.Access.ToString()
+                </span>
+            </div>
+            <div class="">
+                @foreach (var access in Enum.GetValues(typeof(Access)))
+                {
+                    bool isChecked = user.Access.ToString() == access.ToString() ? true : false;
+
+                    <div class="form-check">
+                        <input name="[@i].access"
+                               id="access@(i)"
+                               type="radio"
+                               value="@access"
+                               checked="@isChecked"
+                               class="form-check-input">
+                        <label for="access@(i)"
+                                class="form-check-label">
+                            @access.ToString()
+                        </label>
+                    </div>
+                }
+            </div>
+            <input type="hidden" name="[@i].email" value="@user.Email" />
+        </div>
+        i++;
+    }
+
+    <input type="submit" value="Manage Claims" class="btn btn-lg btn-warning rounded-1" />
+</form>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("adminMenuId2").classList.add("active");
+        document.getElementById("adminMenuId2").classList.add("bg-info");
+        document.getElementById("adminMenuId2").classList.add("rounded");
+        document.getElementById("adminMenuId2").classList.add("rounded-1");
+    });
+</script>
